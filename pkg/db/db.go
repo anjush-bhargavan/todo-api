@@ -15,7 +15,7 @@ func ConnectScylla(config *config.Config) (*gocql.Session, error) {
 		return nil, fmt.Errorf("error creating ScyllaDB session: %v", err)
 	}
 
-	err = CreateTable(session)
+	err = createTable(session)
 	if err != nil {
 		session.Close()
 		return nil, fmt.Errorf("error creating table: %v", err)
@@ -24,8 +24,8 @@ func ConnectScylla(config *config.Config) (*gocql.Session, error) {
 	return session, nil
 }
 
-// CreateTable creates the todos table in ScyllaDB
-func CreateTable(session *gocql.Session) error {
+// createTable creates the todos table in ScyllaDB
+func createTable(session *gocql.Session) error {
     todoTableQuery := `
     CREATE TABLE IF NOT EXISTS todos (
         id UUID PRIMARY KEY,

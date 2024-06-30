@@ -4,8 +4,9 @@ import "github.com/spf13/viper"
 
 // Config struct maps to the environment variables
 type Config struct {
-    DBHost     string `mapstructure:"DBHOST"`
-    DBKeyspace string `mapstructure:"DBKEYSPACE"`
+	PORT       string `mapstructure:"PORT"`
+	DBHost     string `mapstructure:"DBHOST"`
+	DBKeyspace string `mapstructure:"DBKEYSPACE"`
 }
 
 // LoadConfig will load the environment variables to accessible.
