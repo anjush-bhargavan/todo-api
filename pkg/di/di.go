@@ -24,9 +24,13 @@ func Init() {
 	todoSvc := service.NewTodoService(todoRepo)
 	todoHandler := handler.NewTodoHandler(todoSvc)
 
+	userRepo := repo.NewUserRepository(session)
+	userSvc := service.NewUserService(userRepo,cnfg)
+	userHandler := handler.NewUserHandler(userSvc)
+
 	server := server.NewServer()
 
-	routes.RegisterRoutes(server.R,todoHandler)
+	routes.RegisterRoutes(server.R,todoHandler,userHandler,cnfg)
 
 	server.StartServer(cnfg.PORT)
 }

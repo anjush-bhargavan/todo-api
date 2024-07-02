@@ -28,21 +28,23 @@ func ConnectScylla(config *config.Config) (*gocql.Session, error) {
 func createTable(session *gocql.Session) error {
     todoTableQuery := `
     CREATE TABLE IF NOT EXISTS todos (
-        id UUID PRIMARY KEY,
+        id UUID,
         user_id UUID,
         title TEXT,
         description TEXT,
         status TEXT,
         created TIMESTAMP,
-        updated TIMESTAMP
+        updated TIMESTAMP,
+        PRIMARY KEY (user_id, id)
     );
     `
     userTableQuery := `
     CREATE TABLE IF NOT EXISTS users (
-        id UUID PRIMARY KEY,
+        id UUID,
         username TEXT,
         email TEXT,
-        password TEXT
+        password TEXT,
+		PRIMARY KEY (email, id)
     );
     `
     

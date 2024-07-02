@@ -1,6 +1,8 @@
 package repo
 
 import (
+	"fmt"
+
 	"github.com/anjush-bhargavan/todo-api/pkg/models"
 	"github.com/anjush-bhargavan/todo-api/pkg/repo/interfaces"
 	"github.com/gocql/gocql"
@@ -47,21 +49,42 @@ func (r *TodoRepository) DeleteTodo(id string) error {
 	return nil
 }
 
-func (r *TodoRepository) ListTodo(userID string, limit, offset int, status string) ([]*models.Todo, error) {
+func (r *TodoRepository) ListTodos(limit, offset int, userID, status string) ([]*models.Todo, error) {
 	var todos []*models.Todo
-	query := `SELECT id, user_id, title, description, status, created, updated FROM todos WHERE user_id = ?`
-	if status != "" {
-		query += ` AND status = ?`
-	}
-	query += ` LIMIT ? OFFSET ?`
 
-	iter := r.Session.Query(query, userID, status, limit, offset).Iter()
-	var todo models.Todo
-	for iter.Scan(&todo.ID, &todo.UserID, &todo.Title, &todo.Description, &todo.Status, &todo.Created, &todo.Updated) {
-		todos = append(todos, &todo)
-	}
+	query := `SELECT id, user_id, title, description, status, created, updated FROM todos WHERE user_id = ?`
+    var args []interface{}
+    args = append(args, userID)
+
+    if status != "" {
+        query += ` AND status = ?`
+        args = append(args, status)
+    }
+
+    query += ` LIMIT ? ALLOW FILTERING`
+    args = append(args, limit+offset)
+
+    iter := r.Session.Query(query, args...).Iter()
+    var todo models.Todo
+    for iter.Scan(&todo.ID, &todo.UserID, &todo.Title, &todo.Description, &todo.Status, &todo.Created, &todo.Updated) {
+        newTodo := todo
+        todos = append(todos, &newTodo)
+    }
+
 	if err := iter.Close(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to close iterator: %v", err)
 	}
-	return todos, nil
+	fmt.Println(todos,limit,offset,userID,status,query)
+
+	if offset > len(todos) {
+        return []*models.Todo{}, nil
+    }
+
+    end := offset + limit
+    if end > len(todos) {
+        end = len(todos)
+    }
+
+    return todos[offset:end], nil
 }
+

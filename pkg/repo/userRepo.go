@@ -30,3 +30,12 @@ func (r *UserRepository) GetUserByID(id string) (*models.User, error) {
 	}
 	return &user, nil
 }
+
+func (r *UserRepository) GetUserByEmail(email string) (*models.User, error) {
+	var user models.User
+	query := `SELECT id, username, email, password FROM users WHERE email = ? ALLOW FILTERING`
+	if err := r.Session.Query(query, email).Scan(&user.ID, &user.Username, &user.Email, &user.Password); err != nil {
+		return nil, err
+	}
+	return &user, nil
+}

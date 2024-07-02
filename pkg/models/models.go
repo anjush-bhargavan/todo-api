@@ -24,3 +24,9 @@ type User struct {
     Email    string     `json:"email"`
     Password string     `json:"password"`
 }
+
+// Login struct represents the user login data
+type Login struct {
+    Email    string     `json:"email"`
+    Password string     `json:"password"`
+}
